@@ -1,4 +1,4 @@
-FROM lotosbin/docker-ssh-slave
+FROM lotosbin/docker-ssh-slave:10.0.2-13-jdk
 LABEL MAINTAINER="liubinbin <lotosbin@gmail.com>"
 
 # Set desired Android Linux SDK version
