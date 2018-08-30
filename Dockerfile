@@ -126,3 +126,50 @@ RUN set -ex \
 
 # add to PATH
 # ENV PATH ${PATH}:${ANDROID_NDK_HOME}
+
+
+RUN	echo "y" | android update sdk -u -a --filter platform-tools,android-25,build-tools-25.0.2,extra-android-m2repository,extra-android-support,extra-google-m2repository
+	#&& chmod -R 755 $ANDROID_HOME
+
+# fix permission issue
+RUN chown -R jenkins:jenkins $ANDROID_HOME
+
+ENV TZ=Asia/Shanghai
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+
+# Ensure UTF-8 locale
+#COPY locale /etc/default/locale
+RUN apt-get update && apt-get install -y locales
+RUN locale-gen zh_CN.UTF-8 &&\
+  DEBIAN_FRONTEND=noninteractive dpkg-reconfigure locales
+RUN locale-gen zh_CN.UTF-8
+ENV LANG zh_CN.UTF-8
+ENV LANGUAGE zh_CN:zh
+#ENV LC_ALL zh_CN.UTF-8
+
+
+RUN	echo "y" | android update sdk -u -a --filter platform-tools,android-26,build-tools-26.0.2,extra-android-m2repository,extra-android-support,extra-google-m2repository
+	#&& chmod -R 755 $ANDROID_HOME
+RUN	echo "y" | android update sdk -u -a --filter build-tools-26.0.1
+COPY ./.npmrc /home/jenkins/
+RUN	echo "y" | android update sdk -u -a --filter android-23,build-tools-25.0.0
+RUN	echo "y" | android update sdk -u -a --filter android-21,android-22
+
+# Download Android ndk
+RUN apt-get install -y unzip
+# fix permission issue
+RUN chown -R jenkins:jenkins $ANDROID_HOME
+# android-ndk-r14b-linux-x86_64
+ENV ANDROID_NDK_VERSION r14b
+ENV ANDROID_NDK_HOME /opt/android-ndk-$ANDROID_NDK_VERSION
+RUN  curl -O https://dl.google.com/android/repository/android-ndk-$ANDROID_NDK_VERSION-linux-x86_64.zip \
+  && ls . \
+  && unzip -q android-ndk-$ANDROID_NDK_VERSION-linux-x86_64.zip \
+  && mv android-ndk-$ANDROID_NDK_VERSION /opt/android-ndk-$ANDROID_NDK_VERSION \
+  && rm android-ndk-$ANDROID_NDK_VERSION-linux-x86_64.zip
+ENV PATH ${PATH}:${ANDROID_NDK_HOME}
+
+
+
+RUN	echo "y" | android update sdk -u -a --filter android-27,build-tools-27.0.3
